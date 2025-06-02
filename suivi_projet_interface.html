@@ -1,0 +1,814 @@
+        function renderTable(data = projects) {
+            const tbody = document.getElementById('projectTableBody');
+            tbody.innerHTML = '';
+
+            data.forEach(project => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><span class="status-badge status-${project.etat.replace(/\s+/g, '-').replace('à', 'a')}">${project.etat}</span></td>
+                    <td class="date-cell">${formatDate(project.sorti_doss<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi Production 2025</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .controls {
+            padding: 25px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: calc(100vh - 300px);
+        }
+
+        .project-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .project-table th {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .project-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid #f1f3f4;
+            transition: all 0.3s ease;
+        }
+
+        .project-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+            transform: scale(1.01);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+
+        .status-pret {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .status-cours {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: white;
+        }
+
+        .status-attente {
+            background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+            color: white;
+        }
+
+        .status-termine {
+            background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+            color: white;
+        }
+
+        .type-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 11px;
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .date-cell {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .stats {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Suivi Production 2025</h1>
+            <p>Tableau de bord des projets en cours</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" style="color: #28a745;" id="stat-pret">5</div>
+                <div class="stat-label">Prêt à poser</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" style="color: #ffc107;" id="stat-cours">1</div>
+                <div class="stat-label">En cours</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" style="color: #dc3545;" id="stat-attente">1</div>
+                <div class="stat-label">En attente</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" style="color: #6f42c1;" id="stat-total">7</div>
+                <div class="stat-label">Total projets</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="openModal()">
+                <span>+</span> Nouveau Projet
+            </button>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Rechercher par nom, ville, type...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <select id="filterStatus" onchange="filterTable()">
+                <option value="">Tous les états</option>
+                <option value="prêt à poser">Prêt à poser</option>
+                <option value="en cours">En cours</option>
+                <option value="en attente">En attente</option>
+                <option value="terminé">Terminé</option>
+            </select>
+        </div>
+
+        <div class="table-container">
+            <table class="project-table" id="projectTable">
+                <thead>
+                    <tr>
+                        <th>État</th>
+                        <th>Sorti dossier BE</th>
+                        <th>Nom</th>
+                        <th>Ville</th>
+                        <th>Type</th>
+                        <th>RAL</th>
+                        <th>Soudure</th>
+                        <th>Tôle</th>
+                        <th>Cintrage</th>
+                        <th>Préparation</th>
+                        <th>Débit</th>
+                        <th>Usinage</th>
+                        <th>Divers</th>
+                        <th>Vitrage</th>
+                        <th>Isotoit</th>
+                        <th>Commande</th>
+                        <th>Spot</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="projectTableBody">
+                    <!-- Les données seront chargées ici -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter/modifier un projet -->
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <h2>Nouveau Projet</h2>
+            <form id="projectForm">
+                <div class="form-group">
+                    <label for="nom">Nom du projet:</label>
+                    <input type="text" id="nom" name="nom" required>
+                </div>
+                <div class="form-group">
+                    <label for="ville">Ville:</label>
+                    <input type="text" id="ville" name="ville" required>
+                </div>
+                <div class="form-group">
+                    <label for="etat">État:</label>
+                    <select id="etat" name="etat" required>
+                        <option value="prêt à poser">Prêt à poser</option>
+                        <option value="en cours">En cours</option>
+                        <option value="en attente">En attente</option>
+                        <option value="terminé">Terminé</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="type_projet">Type de projet:</label>
+                    <select id="type_projet" name="type_projet" required>
+                        <option value="P">P</option>
+                        <option value="GC">GC</option>
+                        <option value="Structure + Escalier">Structure + Escalier</option>
+                        <option value="Carport">Carport</option>
+                        <option value="Structure Verticoffre">Structure Verticoffre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sorti_dossier_be">Date sortie dossier BE:</label>
+                    <input type="date" id="sorti_dossier_be" name="sorti_dossier_be">
+                </div>
+                <div class="form-group">
+                    <label for="ral">RAL:</label>
+                    <input type="text" id="ral" name="ral">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 30px;">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    <button type="button" class="btn" onclick="closeModal()" style="background: #6c757d; color: white;">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let projects = [];
+        let currentEditId = null;
+        const API_BASE = './api/projets.php'; // Ajustez le chemin selon votre structure
+
+        // Fonctions API
+        async function loadProjects() {
+            try {
+                const response = await fetch(API_BASE);
+                const data = await response.json();
+                projects = data.records || [];
+                renderTable();
+                updateStats();
+            } catch (error) {
+                console.error('Erreur lors du chargement des projets:', error);
+                // Utiliser des données d'exemple en cas d'erreur
+                projects = [
+                    {
+                        id: 1,
+                        etat: "en cours",
+                        sorti_dossier_be: "2025-03-25",
+                        nom: "HASS",
+                        ville: "Kembis",
+                        type_projet: "P",
+                        ral: "",
+                        soudure: "",
+                        tole: "",
+                        cintrage: "25 avril",
+                        preparation_lasurage: "",
+                        debit: "",
+                        usinage: "",
+                        divers: "",
+                        vitrage: "",
+                        isotoit: "",
+                        commande_composite: "",
+                        spot: ""
+                    },
+                    {
+                        id: 2,
+                        etat: "prêt à poser",
+                        sorti_dossier_be: "2025-06-27",
+                        nom: "JEANNENOT",
+                        ville: "Etueffont",
+                        type_projet: "P",
+                        ral: "RM",
+                        soudure: "",
+                        tole: "",
+                        cintrage: "",
+                        preparation_lasurage: "",
+                        debit: "",
+                        usinage: "",
+                        divers: "",
+                        vitrage: "",
+                        isotoit: "",
+                        commande_composite: "",
+                        spot: ""
+                    },
+                    {
+                        id: 3,
+                        etat: "prêt à poser",
+                        sorti_dossier_be: "2025-07-18",
+                        nom: "MAURER",
+                        ville: "Burnhaupt-le-bas",
+                        type_projet: "P",
+                        ral: "7016s",
+                        soudure: "23 juillet",
+                        tole: "",
+                        cintrage: "",
+                        preparation_lasurage: "",
+                        debit: "",
+                        usinage: "",
+                        divers: "",
+                        vitrage: "",
+                        isotoit: "",
+                        commande_composite: "",
+                        spot: ""
+                    },
+                    {
+                        id: 4,
+                        etat: "prêt à poser",
+                        sorti_dossier_be: "2025-07-19",
+                        nom: "VONESCH",
+                        ville: "Meyenheim",
+                        type_projet: "P",
+                        ral: "9210",
+                        soudure: "",
+                        tole: "",
+                        cintrage: "",
+                        preparation_lasurage: "",
+                        debit: "",
+                        usinage: "",
+                        divers: "",
+                        vitrage: "",
+                        isotoit: "",
+                        commande_composite: "",
+                        spot: ""
+                    },
+                    {
+                        id: 5,
+                        etat: "prêt à poser",
+                        sorti_dossier_be: "2025-09-02",
+                        nom: "LITHARD",
+                        ville: "Sigolsheim",
+                        type_projet: "Structure + Escalier",
+                        ral: "2100s",
+                        soudure: "5 septembre",
+                        tole: "",
+                        cintrage: "",
+                        preparation_lasurage: "",
+                        debit: "",
+                        usinage: "",
+                        divers: "",
+                        vitrage: "",
+                        isotoit: "",
+                        commande_composite: "",
+                        spot: ""
+                    },
+                    {
+                        id: 6,
+                        etat: "en attente",
+                        sorti_dossier_be: "2025-09-06",
+                        nom: "LAZARUS-FREI",
+                        ville: "Didilenheim",
+                        type_projet: "Carport",
+                        ral: "900s + 9006s",
+                        soudure: "",
+                        tole: "",
+                        cintrage: "",
+                        preparation_lasurage: "",
+                        debit: "",
+                        usinage: "",
+                        divers: "",
+                        vitrage: "",
+                        isotoit: "",
+                        commande_composite: "",
+                        spot: ""
+                    },
+                    {
+                        id: 7,
+                        etat: "prêt à poser",
+                        sorti_dossier_be: "2025-09-09",
+                        nom: "BOUILLARD",
+                        ville: "Evette-salbert",
+                        type_projet: "Structure Verticoffre",
+                        ral: "7016s",
+                        soudure: "",
+                        tole: "",
+                        cintrage: "",
+                        preparation_lasurage: "",
+                        debit: "",
+                        usinage: "",
+                        divers: "",
+                        vitrage: "",
+                        isotoit: "",
+                        commande_composite: "",
+                        spot: ""
+                    }
+                ];
+                renderTable();
+                updateStats();
+            }
+        }
+
+        async function saveProject(projectData) {
+            try {
+                const method = currentEditId ? 'PUT' : 'POST';
+                const url = API_BASE;
+                
+                if (currentEditId) {
+                    projectData.id = currentEditId;
+                }
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(projectData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    await loadProjects(); // Recharger les données
+                    showNotification('Projet sauvegardé avec succès!', 'success');
+                    return true;
+                } else {
+                    showNotification('Erreur lors de la sauvegarde: ' + result.message, 'error');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Erreur lors de la sauvegarde:', error);
+                showNotification('Erreur de communication avec le serveur', 'error');
+                return false;
+            }
+        }
+
+        async function deleteProject(id) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({id: id})
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    await loadProjects();
+                    showNotification('Projet supprimé avec succès!', 'success');
+                } else {
+                    showNotification('Erreur lors de la suppression: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Erreur lors de la suppression:', error);
+                showNotification('Erreur de communication avec le serveur', 'error');
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            // Créer une notification toast
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                ${type === 'success' ? 'background: #28a745;' : 
+                  type === 'error' ? 'background: #dc3545;' : 'background: #17a2b8;'}
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Ajouter les styles pour les animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        function renderTable(data = projects) {
+            const tbody = document.getElementById('projectTableBody');
+            tbody.innerHTML = '';
+
+            data.forEach(project => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><span class="status-badge status-${project.etat.replace(/\s+/g, '-').replace('à', 'a')}">${project.etat}</span></td>
+                    <td class="date-cell">${formatDate(project.sorti_dossier_be)}</td>
+                    <td><strong>${project.nom}</strong></td>
+                    <td>${project.ville}</td>
+                    <td><span class="type-badge">${project.type_projet}</span></td>
+                    <td>${project.ral}</td>
+                    <td>${project.soudure}</td>
+                    <td>${project.tole}</td>
+                    <td>${project.cintrage}</td>
+                    <td>${project.preparation}</td>
+                    <td>${project.debit}</td>
+                    <td>${project.usinage}</td>
+                    <td>${project.divers}</td>
+                    <td>${project.vitrage}</td>
+                    <td>${project.isotoit}</td>
+                    <td>${project.commande}</td>
+                    <td>${project.spot}</td>
+                    <td>
+                        <button onclick="editProject(${project.id})" class="btn" style="background: #17a2b8; color: white; padding: 6px 12px; font-size: 12px;">Modifier</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('fr-FR');
+        }
+
+        function updateStats() {
+            const stats = projects.reduce((acc, project) => {
+                acc[project.etat] = (acc[project.etat] || 0) + 1;
+                return acc;
+            }, {});
+
+            document.getElementById('stat-pret').textContent = stats['prêt à poser'] || 0;
+            document.getElementById('stat-cours').textContent = stats['en cours'] || 0;
+            document.getElementById('stat-attente').textContent = stats['en attente'] || 0;
+            document.getElementById('stat-total').textContent = projects.length;
+        }
+
+        function filterTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('filterStatus').value;
+
+            const filteredData = projects.filter(project => {
+                const matchesSearch = !searchTerm || 
+                    project.nom.toLowerCase().includes(searchTerm) ||
+                    project.ville.toLowerCase().includes(searchTerm) ||
+                    project.type_projet.toLowerCase().includes(searchTerm);
+                
+                const matchesStatus = !statusFilter || project.etat === statusFilter;
+
+                return matchesSearch && matchesStatus;
+            });
+
+            renderTable(filteredData);
+        }
+
+        function openModal() {
+            document.getElementById('projectModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('projectModal').style.display = 'none';
+            document.getElementById('projectForm').reset();
+        }
+
+        function editProject(id) {
+            const project = projects.find(p => p.id === id);
+            if (project) {
+                // Remplir le formulaire avec les données du projet
+                Object.keys(project).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element) {
+                        element.value = project[key];
+                    }
+                });
+                openModal();
+            }
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', filterTable);
+        
+        document.getElementById('projectForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Ici, vous ajouteriez la logique pour sauvegarder en base de données
+            console.log('Formulaire soumis');
+            closeModal();
+        });
+
+        // Fermer le modal en cliquant à l'extérieur
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('projectModal');
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Initialisation
+        renderTable();
+        updateStats();
+    </script>
+</body>
+</html>
